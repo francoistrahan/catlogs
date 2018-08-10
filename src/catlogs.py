@@ -6,7 +6,7 @@ import re
 
 from functools import partial
 
-VERSION = "1.0.0"
+VERSION = "1.0.1-dev"
 
 COMPRESSION_READERS = {
     "gz":partial(gzip.open, mode="rt")
