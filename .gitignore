@@ -1,2 +1,12 @@
+
+# Caches
 __pycache__
+
+# Jetbrain
 /.idea/workspace.xml
+
+# Compil / packaging
+
+/src/build
+/src/dist
+/src/*.egg-info

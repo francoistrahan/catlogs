@@ -9,7 +9,7 @@ from catlog.app import App
 def main():
     logging.basicConfig(stream=sys.stderr, style="{", format="{levelname}: {msg}")
 
-    app = App()
+    app = App(sys.argv)
     try:
         exit(app.run())
     except ReportException as e:
