@@ -1,4 +1,5 @@
 from io import StringIO
+import re
 import unittest
 from unittest.mock import patch
 
@@ -70,7 +71,7 @@ class TestCatlog(unittest.TestCase):
                     "                        which case it is assigned number -1. (Default:\n"
                     "                        \"([0-9]+)\")\n"
                     "\n"
-                    "Version: 1.0.1-dev\n")
+                    )
 
         self.addArgs("-h")
         with self.assertRaises(ArgparseExitException)as ex:
@@ -78,7 +79,7 @@ class TestCatlog(unittest.TestCase):
         self.assertEqual(0, ex.exception.status)
         self.assertEqual(None, ex.exception.message)
 
-        self.assertEqual(EXPECTED, self.stdout.getvalue())
+        self.assertRegex(self.stdout.getvalue(), re.escape(EXPECTED))
         self.assertEqual("", self.stderr.getvalue())
 
 
