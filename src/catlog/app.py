@@ -17,11 +17,13 @@ class App:
         import argparse
 
         parser = argparse.ArgumentParser(
+            prog="catlog",
             description="""
             Prints out a series of rotated log file in decending numerical order. Duplicates are printed out only once.
 
             Supported compression formats are the following: {}""".format(", ".join(KNOWN_COMPRESSIONS)),
             epilog="Version: {}".format(VERSION),
+
             )
         parser.add_argument(
             "LOG_PART",

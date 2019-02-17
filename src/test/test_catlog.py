@@ -15,6 +15,8 @@ class ArgparseExitException(Exception):
 
 class TestCatlog(unittest.TestCase):
     def setUp(self):
+        self.maxDiff = None
+
         self.stdout = StringIO()
         patcher = patch("sys.stdout", self.stdout)
         patcher.start()
@@ -50,7 +52,7 @@ class TestCatlog(unittest.TestCase):
 
 
     def test_help(self):
-        EXPECTED = ("usage: _jb_unittest_runner.py [-h] [-d] [-r REGEX] LOG_PART [LOG_PART ...]\n"
+        EXPECTED = ("usage: catlog [-h] [-d] [-r REGEX] LOG_PART [LOG_PART ...]\n"
                     "\n"
                     "Prints out a series of rotated log file in decending numerical order.\n"
                     "Duplicates are printed out only once. Supported compression formats are the\n"
@@ -69,7 +71,7 @@ class TestCatlog(unittest.TestCase):
                     "                        \"([0-9]+)\")\n"
                     "\n"
                     "Version: 1.0.1-dev\n")
-
+        
         self.addArgs("-h")
         with self.assertRaises(ArgparseExitException)as ex:
             self.runapp()
