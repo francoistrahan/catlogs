@@ -1,10 +1,15 @@
 import logging
 
-from catlog import ReportException, Errors, KNOWN_COMPRESSIONS, VERSION, DEFAULT_REGEX
+from catlog import DEFAULT_REGEX, Errors, KNOWN_COMPRESSIONS, ReportException, VERSION
 
 
 
 class App:
+
+    def __init__(self) -> None:
+        self.options = None
+
+
     def getOptions(self):
         import argparse
 
