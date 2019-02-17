@@ -1,64 +1,41 @@
-#! /usr/bin/python3
-
+from functools import partial
 import logging
-import gzip
 import re
 
-from functools import partial
-
-VERSION = "1.0.0"
-
-COMPRESSION_READERS = {
-    "gz":partial(gzip.open, mode="rt")
-    }
-
-KNOWN_COMPRESSIONS = sorted(COMPRESSION_READERS.keys())
-
-DEFAULT_REGEX = r"""([0-9]+)"""
-
-EXTENSION_REGEX = re.compile(r"""^.*\.([^.]+)$""")
+from catlogs import COMPRESSION_READERS, DEFAULT_REGEX, Errors, getExtension, KNOWN_COMPRESSIONS, ReportException, VERSION
 
 
 
-class Errors:
-    Config = -1
-    Numbering = -2
-    IO = 1
-
-class ReportException(Exception):
-    def __init__(self, code, msg):
-        super().__init__(msg)
-        self.code = code
-
-
-def getExtension(filepath):
-    m = EXTENSION_REGEX.match(filepath)
-    if m:
-        return m.group(1)
-    else:
-        return None
-        
 class App:
+
+    def __init__(self, argv) -> None:
+        self.options = None
+        self.argv = argv
+
+
     def getOptions(self):
         import argparse
+
         parser = argparse.ArgumentParser(
+            prog="catlogs",
             description="""
             Prints out a series of rotated log file in decending numerical order. Duplicates are printed out only once.
 
             Supported compression formats are the following: {}""".format(", ".join(KNOWN_COMPRESSIONS)),
             epilog="Version: {}".format(VERSION),
-        )
+
+            )
         parser.add_argument(
             "LOG_PART",
             help="Files containing the rotated parts of the log",
             nargs="+",
             type=str
-        )
+            )
         parser.add_argument(
             "-d", "--debug",
             help="Output debug information on stderr",
             action="store_true"
-        )
+            )
         parser.add_argument(
             "-r", "--regex",
             help="""REGEX used to parse the log file number.
@@ -68,15 +45,15 @@ class App:
             type=str,
             default=DEFAULT_REGEX
             )
-        self.options = parser.parse_args()
+        self.options = parser.parse_args(self.argv[1:])
 
         if self.options.debug: self.logger.setLevel(logging.DEBUG)
 
 
-
     def debug(self, fmt, *args):
         self.logger.debug(fmt.format(*args))
-    
+
+
     def run(self):
         # Read the options
         self.logger = logging.getLogger()
@@ -89,21 +66,20 @@ class App:
         except Exception as e:
             raise ReportException(Errors.Config, """Invalid Regex: "{}": {}""".format(self.options.regex, e))
 
-
         # Sort files and check for duplicate numbers
         files = self.options.LOG_PART
         self.debug("Files provided: {}", ", ".join(files))
         files = ((self.regex.search(f), f) for f in files)
-        files = ((m and m.group(1) or "-1", f) for m,f in files)
-        files = ((int(n), f) for n,f in files)
+        files = ((m and m.group(1) or "-1", f) for m, f in files)
+        files = ((int(n), f) for n, f in files)
         files = sorted(files, reverse=True)
 
         for i in range(2, len(files), 1):
-            if files[i][0] == files[i-1][0]:
-                raise ReportException(Errors.Numbering, "Duplicate number: {} on files {} and {}".format(files[i][0], files[i-1][1], files[i][1]))
+            if files[i][0] == files[i - 1][0]:
+                raise ReportException(Errors.Numbering, "Duplicate number: {} on files {} and {}".format(files[i][0], files[i - 1][1], files[i][1]))
 
-        files = [f for n,f in files]
-        
+        files = [f for n, f in files]
+
         self.debug("Files, sorted: {}", ", ".join(files))
 
         # Output files
@@ -122,20 +98,3 @@ class App:
                     print(l, end="")
             except Exception as e:
                 raise ReportException(Errors.IO, "Error reading {}: {}".format(f, e))
-        
-
-def main():
-    app = App()        
-    try:
-        app.run()
-    except ReportException as e:
-        msg = str(e)
-        logging.critical(msg)
-        exit(e.code)
-        
-
-
-if __name__ == "__main__":
-    import sys
-    logging.basicConfig(stream=sys.stderr, style="{", format="{levelname}: {msg}")
-    main()
