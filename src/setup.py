@@ -11,6 +11,7 @@ setup(
     version=VERSION,
     author="François Trahan",
     author_email="francois.trahan@gmail.com",
+    urt="https://github.com/francoistrahan/catlogs",
 
     packages=find_packages(exclude=["test"]),
 
