@@ -1,4 +1,4 @@
-import io
+from io import StringIO
 import unittest
 from unittest.mock import patch
 
@@ -15,12 +15,12 @@ class ArgparseExitException(Exception):
 
 class TestCatlog(unittest.TestCase):
     def setUp(self):
-        self.stdout = io.StringIO()
+        self.stdout = StringIO()
         patcher = patch("sys.stdout", self.stdout)
         patcher.start()
         self.addCleanup(patcher.stop)
 
-        self.stderr = io.StringIO()
+        self.stderr = StringIO()
         patcher = patch("sys.stderr", self.stderr)
         patcher.start()
         self.addCleanup(patcher.stop)
