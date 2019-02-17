@@ -6,8 +6,9 @@ from catlog import DEFAULT_REGEX, Errors, KNOWN_COMPRESSIONS, ReportException, V
 
 class App:
 
-    def __init__(self) -> None:
+    def __init__(self, argv) -> None:
         self.options = None
+        self.argv = argv
 
 
     def getOptions(self):
@@ -40,7 +41,7 @@ class App:
             type=str,
             default=DEFAULT_REGEX
             )
-        self.options = parser.parse_args()
+        self.options = parser.parse_args(self.argv)
 
         if self.options.debug: self.logger.setLevel(logging.DEBUG)
 
