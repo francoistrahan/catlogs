@@ -7,6 +7,8 @@ from catlog.app import App
 
 
 def main():
+    logging.basicConfig(stream=sys.stderr, style="{", format="{levelname}: {msg}")
+
     app = App()
     try:
         exit(app.run())
@@ -18,5 +20,4 @@ def main():
 
 
 if __name__ == "__main__":
-    logging.basicConfig(stream=sys.stderr, style="{", format="{levelname}: {msg}")
     main()
