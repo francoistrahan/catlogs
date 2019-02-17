@@ -75,6 +75,40 @@ class TestCatlog(unittest.TestCase):
             self.runapp()
         self.assertEqual(0, ex.exception.status)
         self.assertEqual(None, ex.exception.message)
-        
+
         self.assertEqual(EXPECTED, self.stdout.getvalue())
         self.assertEqual("", self.stderr.getvalue())
+
+
+    def test_unordered_files(self):
+        EXPECTED = ("This is file 5, line 1\n"
+                    "This is file 5, line 2\n"
+                    "This is file 5, line 3\n"
+                    "This is file 4, line 1\n"
+                    "This is file 4, line 2\n"
+                    "This is file 4, line 3\n"
+                    "This is file 3, line 1\n"
+                    "This is file 3, line 2\n"
+                    "This is file 3, line 3\n"
+                    "This is file 2, line 1\n"
+                    "This is file 2, line 2\n"
+                    "This is file 2, line 3\n"
+                    "This is file 1, line 1\n"
+                    "This is file 1, line 2\n"
+                    "This is file 1, line 3\n"
+                    "This is file 0, line 1\n"
+                    "This is file 0, line 2\n"
+                    "This is file 0, line 3\n")
+
+        self.addArgs(
+            "test/sample_files/dotlogfile.4.log.gz",
+            "test/sample_files/dotlogfile.0.log",
+            "test/sample_files/dotlogfile.2.log.gz",
+            "test/sample_files/dotlogfile.5.log.gz",
+            "test/sample_files/dotlogfile.1.log",
+            "test/sample_files/dotlogfile.3.log.gz",
+            )
+
+        self.runapp()
+
+        self.assertEqual(EXPECTED, self.stdout.getvalue())

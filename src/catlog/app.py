@@ -1,6 +1,8 @@
+from functools import partial
 import logging
+import re
 
-from catlog import DEFAULT_REGEX, Errors, KNOWN_COMPRESSIONS, ReportException, VERSION
+from catlog import COMPRESSION_READERS, DEFAULT_REGEX, Errors, getExtension, KNOWN_COMPRESSIONS, ReportException, VERSION
 
 
 
@@ -41,7 +43,7 @@ class App:
             type=str,
             default=DEFAULT_REGEX
             )
-        self.options = parser.parse_args(self.argv)
+        self.options = parser.parse_args(self.argv[1:])
 
         if self.options.debug: self.logger.setLevel(logging.DEBUG)
 
