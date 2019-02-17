@@ -2,7 +2,7 @@ from functools import partial
 import logging
 import re
 
-from catlog import COMPRESSION_READERS, DEFAULT_REGEX, Errors, getExtension, KNOWN_COMPRESSIONS, ReportException, VERSION
+from catlogs import COMPRESSION_READERS, DEFAULT_REGEX, Errors, getExtension, KNOWN_COMPRESSIONS, ReportException, VERSION
 
 
 
@@ -17,7 +17,7 @@ class App:
         import argparse
 
         parser = argparse.ArgumentParser(
-            prog="catlog",
+            prog="catlogs",
             description="""
             Prints out a series of rotated log file in decending numerical order. Duplicates are printed out only once.
 

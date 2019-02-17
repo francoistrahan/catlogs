@@ -2,7 +2,7 @@ from io import StringIO
 import unittest
 from unittest.mock import patch
 
-from catlog.app import App
+from catlogs.app import App
 
 
 
@@ -31,7 +31,7 @@ class TestCatlog(unittest.TestCase):
         patcher.start()
         self.addCleanup(patcher.stop)
 
-        self.argv = ["catlog"]
+        self.argv = ["catlogs"]
 
 
     def tearDown(self) -> None:
@@ -52,7 +52,7 @@ class TestCatlog(unittest.TestCase):
 
 
     def test_help(self):
-        EXPECTED = ("usage: catlog [-h] [-d] [-r REGEX] LOG_PART [LOG_PART ...]\n"
+        EXPECTED = ("usage: catlogs [-h] [-d] [-r REGEX] LOG_PART [LOG_PART ...]\n"
                     "\n"
                     "Prints out a series of rotated log file in decending numerical order.\n"
                     "Duplicates are printed out only once. Supported compression formats are the\n"
@@ -71,7 +71,7 @@ class TestCatlog(unittest.TestCase):
                     "                        \"([0-9]+)\")\n"
                     "\n"
                     "Version: 1.0.1-dev\n")
-        
+
         self.addArgs("-h")
         with self.assertRaises(ArgparseExitException)as ex:
             self.runapp()

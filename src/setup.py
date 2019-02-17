@@ -2,12 +2,12 @@
 
 from setuptools import find_packages, setup
 
-from catlog import VERSION
+from catlogs import VERSION
 
 
 
 setup(
-    name="catlog",
+    name="catlogs",
     version=VERSION,
     author="François Trahan",
     author_email="francois.trahan@gmail.com",
@@ -16,7 +16,7 @@ setup(
 
     entry_points={
         'console_scripts': [
-            'catlog = catlog.__main__:main',
+            'catlogs = catlogs.__main__:main',
             ],
         },
 

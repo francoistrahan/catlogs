@@ -1,8 +1,8 @@
 import logging
 import sys
 
-from catlog import ReportException
-from catlog.app import App
+from catlogs import ReportException
+from catlogs.app import App
 
 
 
