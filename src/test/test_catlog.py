@@ -3,6 +3,8 @@ import re
 import unittest
 from unittest.mock import patch
 
+from pytest import fixture, mark, raises
+
 from catlogs.app import App
 
 
@@ -11,6 +13,57 @@ class ArgparseExitException(Exception):
     def __init__(self, status, message):
         self.message = message
         self.status = status
+
+
+
+@fixture
+def mockargparseexit(monkeypatch):
+    def mockexit(parser, status=0, message=None):
+        raise ArgparseExitException(status, message)
+
+
+    monkeypatch.setattr("argparse.ArgumentParser.exit", mockexit)
+
+
+
+def runapp(argv):
+    app = App(["catlogs"] + argv)
+    app.run()
+
+
+
+@mark.usefixtures("mockargparseexit")
+def test_help(capsys):
+    EXPECTED = ("usage: catlogs [-h] [-d] [-r REGEX] LOG_PART [LOG_PART ...]\n"
+                "\n"
+                "Prints out a series of rotated log file in decending numerical order.\n"
+                "Duplicates are printed out only once. Supported compression formats are the\n"
+                "following: gz\n"
+                "\n"
+                "positional arguments:\n"
+                "  LOG_PART              Files containing the rotated parts of the log\n"
+                "\n"
+                "optional arguments:\n"
+                "  -h, --help            show this help message and exit\n"
+                "  -d, --debug           Output debug information on stderr\n"
+                "  -r REGEX, --regex REGEX\n"
+                "                        REGEX used to parse the log file number. Note that a\n"
+                "                        single file is allowed to have a missing number, in\n"
+                "                        which case it is assigned number -1. (Default:\n"
+                "                        \"([0-9]+)\")\n"
+                "\n"
+                "Version: "
+                )
+
+    with raises(ArgparseExitException) as ex:
+        runapp(["-h"])
+        assert ex.value.status == 0
+        assert ex.value.message is None
+
+    outputs = capsys.readouterr()
+    print(outputs.out)
+    assert outputs.out.startswith(EXPECTED)
+    assert "" == outputs.err
 
 
 
