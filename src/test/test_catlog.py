@@ -21,14 +21,21 @@ def mockargparseexit(monkeypatch):
 
 
 
-def runapp(argv):
-    app = App(["catlogs"] + argv)
-    app.run()
+@fixture
+def app():
+    class AppRunner:
+        def run(self, argv):
+            app = App(["catlogs"] + argv)
+            app.run()
+
+
+
+    return AppRunner()
 
 
 
 @mark.usefixtures("mockargparseexit")
-def test_help(capsys):
+def test_help(app, capsys):
     EXPECTED = ("usage: catlogs [-h] [-d] [-r REGEX] LOG_PART [LOG_PART ...]\n"
                 "\n"
                 "Prints out a series of rotated log file in decending numerical order.\n"
@@ -51,7 +58,7 @@ def test_help(capsys):
                 )
 
     with raises(ArgparseExitException) as ex:
-        runapp(["-h"])
+        app.run(["-h"])
         assert ex.value.status == 0
         assert ex.value.message is None
 
@@ -62,7 +69,7 @@ def test_help(capsys):
 
 
 
-def test_unordered_files(capsys):
+def test_unordered_files(app, capsys):
     EXPECTED = ("This is file 5, line 1\n"
                 "This is file 5, line 2\n"
                 "This is file 5, line 3\n"
@@ -90,7 +97,7 @@ def test_unordered_files(capsys):
             "test/sample_files/dotlogfile.1.log",
             "test/sample_files/dotlogfile.3.log.gz", ]
 
-    runapp(ARGS)
+    app.run(ARGS)
 
     outputs = capsys.readouterr()
 
