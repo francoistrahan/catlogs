@@ -1,40 +1,57 @@
-from pytest import fixture, mark, raises
+import sys
+
+from pytest import fixture
 
 from catlogs.app import App
 
 
 
-class ArgparseExitException(Exception):
-    def __init__(self, status, message):
-        self.message = message
+class ExitException(Exception):
+    def __init__(self, status):
         self.status = status
 
 
 
 @fixture
-def mockargparseexit(monkeypatch):
-    def mockexit(parser, status=0, message=None):
-        raise ArgparseExitException(status, message)
-
-
-    monkeypatch.setattr("argparse.ArgumentParser.exit", mockexit)
-
-
-
-@fixture
-def app():
+def app(monkeypatch):
     class AppRunner:
         def run(self, argv):
             app = App(["catlogs"] + argv)
-            app.run()
+
+            monkeypatch.setattr("sys.exit", self.exit)
+            self.exitcode = 0
+            try:
+                app.run()
+            except ExitException as ex:
+                self.exitcode = ex.status
+
+
+        def exit(self, code):
+            raise ExitException(code)
 
 
 
-    return AppRunner()
+    app = AppRunner()
+    return app
 
 
 
-@mark.usefixtures("mockargparseexit")
+def test_noargs(app, capsys):
+    EXPECTED_STDERR = ("usage: catlogs [-h] [-d] [-r REGEX] LOG_PART [LOG_PART ...]\n"
+                       "catlogs: error: the following arguments are required: LOG_PART\n")
+
+    app.run([])
+
+    assert app.exitcode == 2
+
+    outputs = capsys.readouterr()
+    print(outputs.out)
+    print(outputs.err, file=sys.stderr)
+    assert "" == outputs.out
+    assert EXPECTED_STDERR == outputs.err
+
+
+
 def test_help(app, capsys):
     EXPECTED = ("usage: catlogs [-h] [-d] [-r REGEX] LOG_PART [LOG_PART ...]\n"
                 "\n"
@@ -57,10 +74,8 @@ def test_help(app, capsys):
                 "Version: "
                 )
 
-    with raises(ArgparseExitException) as ex:
-        app.run(["-h"])
-        assert ex.value.status == 0
-        assert ex.value.message is None
+    app.run(["-h"])
+    assert app.exitcode == 0
 
     outputs = capsys.readouterr()
     print(outputs.out)
@@ -98,6 +113,7 @@ def test_unordered_files(app, capsys):
             "test/sample_files/dotlogfile.3.log.gz", ]
 
     app.run(ARGS)
+    assert app.exitcode == 0
 
     outputs = capsys.readouterr()
 
