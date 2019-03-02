@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "catlogs"
+version = "1.2.0-next"
+description = "Concatenate logs that have been rotated and compressed"
+authors = ["François Trahan <francois.trahan@gmail.com>"]
+license = "GPL-3.0"
+
+[tool.poetry.scripts]
+catlogs = 'catlogs.__main__:main'
+
+[tool.poetry.dependencies]
+python = "^3.6"
+
+[tool.poetry.dev-dependencies]
+pytest = "^4.3"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

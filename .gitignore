@@ -10,3 +10,4 @@ __pycache__
 /src/build
 /src/dist
 /src/*.egg-info
+/src/pip-wheel-metadata
